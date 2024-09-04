@@ -1,0 +1,2 @@
+hostname,ip_configuration_type,ip_address,subnet_prefix,default_gateway,preferred_dns,alternative_dns,dns_domain_name,domain_ou_path,workgroup_name,state
+win7-PC,dynamic,,,,,,test.local,"OU=RKT,DC=test,DC=local",,domain

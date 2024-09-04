@@ -1,0 +1,7 @@
+# ---
+# network_connection_name: "System eth0"  # Update with your actual connection name
+# new_ip: "{{ ansible_host_ip }}"  # This variable should be defined in inventory or playbook
+# netmask: "24"
+
+# vars/main.yml or similar
+vm_settings: "{{ lookup('community.general.read_csv', '../files/vm_settings.csv') }}"

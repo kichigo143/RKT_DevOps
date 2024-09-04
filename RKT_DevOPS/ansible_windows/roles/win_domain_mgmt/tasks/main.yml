@@ -1,0 +1,106 @@
+# - name: Ensure machine is not a member of the domain
+#   microsoft.ad.membership:
+#     state: absent
+#     domain_name: "{{ domain }}"
+#     domain_admin_user: "{{ domain_admin_user }}"
+#     domain_admin_password: "{{ domain_admin_password }}"
+#   when: domain != ""
+
+# - name: Join machine to the domain
+#   microsoft.ad.membership:
+#     state: present
+#     domain_name: "{{ domain }}"
+#     ou_path: "{{ ou_path }}"
+#     domain_admin_user: "{{ domain_admin_user }}"
+#     domain_admin_password: "{{ domain_admin_password }}"
+#   when: domain != ""
+
+# - name: Ensure machine is not a member of the workgroup
+#   microsoft.ad.membership:
+#     state: absent
+#     workgroup_name: "{{ workgroup }}"
+#   when: workgroup != ""
+
+# - name: Join machine to the workgroup
+#   microsoft.ad.membership:
+#     state: present
+#     workgroup_name: "{{ workgroup }}"
+#   when: workgroup != ""
+
+# - name: Manage Windows Domain/Workgroup Membership
+#   microsoft.ad.membership:
+#     state: "{{ item.state }}"
+#     dns_domain_name: "{{ item.dns_domain_name }}"
+#     domain_ou_path: "{{ item.domain_ou_path }}"
+#     domain_admin_user: "{{ domain_admin_user }}"
+#     domain_admin_password: "{{ domain_admin_password }}"
+#     workgroup_name: "{{ item.workgroup_name }}"
+#   loop: "{{ vm_settings }}"
+#   loop_control:
+#     label: "{{ item.hostname }}"
+#   when: item.dns_domain_name != "" or item.workgroup_name != ""
+
+
+####WORKING####
+
+
+    # - name: Debug domain variables
+    #   ansible.builtin.debug:
+    #     msg:
+    #       - "dns_domain_name: {{ item.dns_domain_name }}"
+    #       - "domain_ou_path: {{ item.domain_ou_path }}"
+    #       - "domain_admin_user: {{ domain_admin_user }}"
+    #       - "domain_admin_password: {{ domain_admin_password }}"
+    #   when: item.state == "domain"
+    #   loop: "{{ vm_settings }}"
+    #   loop_control:
+    #     label: "{{ item.hostname | default('unknown') }}"
+
+    - name: Manage Windows Domain/Workgroup Membership
+      block:
+        - name: Join RKT Domain
+          microsoft.ad.membership:
+            state: domain
+            # reboot: true
+            dns_domain_name: "{{ item.dns_domain_name }}"
+            domain_ou_path: "{{ item.domain_ou_path }}"
+            domain_admin_user: "{{ domain_admin_user }}"
+            domain_admin_password: "{{ domain_admin_password }}"
+          when: item.state == "domain"
+          loop: "{{ vm_settings }}"
+          loop_control:
+            label: "{{ item.hostname }}"
+
+    - name: Join Workgroup
+      microsoft.ad.membership:
+        state: "workgroup"
+        workgroup_name: "{{ item.workgroup_name }}"
+        domain_admin_user: "{{ domain_admin_user }}"  # Optional, depending on module requirements
+        domain_admin_password: "{{ domain_admin_password }}"  # Optional, depending on module requirements
+      when: item.state == "workgroup"
+      loop: "{{ vm_settings }}"
+      loop_control:
+        label: "{{ item.hostname }}"
+
+    - name: Remove Computer from OT Domain
+      win_domain_membership:
+        hostname: "{{ item.hostname }}"
+        domain_admin_user: "{{ domain_admin_user }}"
+        domain_admin_password: "{{ domain_admin_password }}"
+        workgroup_name: "WORKGROUP"
+        state: workgroup
+      when: item.state == "unjoin"
+      loop: "{{ vm_settings }}"
+      loop_control:
+        label: "{{ item.hostname }}"
+
+    # - name: Restart the system
+    #   win_reboot:
+    #     reboot_timeout: 10
+    #   when: item.state == "domain"
+    #   loop: "{{ vm_settings }}"
+    #   loop_control:
+    #     label: "{{ item.hostname }}"
+
+
+

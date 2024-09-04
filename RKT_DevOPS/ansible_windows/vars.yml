@@ -1,0 +1,6 @@
+ansible_user: "{{ vault_ansible_user }}"
+ansible_password: "{{ vault_ansible_password }}"
+# dns_domain_name: "{{ vault_dns_domain_name }}"
+# domain_ou_path: "{{ vault_domain_ou_path }}"
+domain_admin_user: "{{ vault_domain_admin_user }}"
+domain_admin_password: "{{ vault_domain_admin_password }}"

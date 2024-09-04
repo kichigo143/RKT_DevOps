@@ -1,0 +1,38 @@
+
+---
+- name: Update DNS settings
+  ansible.windows.win_shell: |
+    $interfaceName = (Get-WmiObject -Class Win32_NetworkAdapterConfiguration | Where-Object { $_.IPEnabled -eq $true }).Description
+
+    # Define DNS servers
+    $preferredDNS = "{{ item.preferred_dns }}"
+    $alternativeDNS = "{{ item.alternative_dns }}"
+
+    # Initialize DNS servers array with preferred DNS
+    $dnsServers = @($preferredDNS)
+    
+    # Add alternative DNS if it is defined and not empty
+    if ($alternativeDNS) {
+        $dnsServers += $alternativeDNS
+    }
+
+    # Get the network adapter using WMI
+    $adapter = Get-WmiObject -Class Win32_NetworkAdapterConfiguration | Where-Object { $_.Description -eq $interfaceName -and $_.IPEnabled -eq $true }
+
+    if ($adapter) {
+        try {
+            # Set DNS servers
+            $adapter.SetDNSServerSearchOrder($dnsServers)
+            Write-Output "DNS servers updated successfully."
+        } catch {
+            Write-Error "Failed to update DNS servers: $_"
+        }
+    } else {
+        Write-Error "No suitable network adapter found."
+    }
+  loop: "{{ vm_settings }}"
+  loop_control:
+    label: "{{ item.hostname }}"
+  when: item.preferred_dns is defined
+
+

@@ -1,0 +1,3 @@
+# ---
+# domain_admin_user: "{{ vault_domain_admin_user }}"
+# domain_admin_password: "{{ vault_domain_admin_password }}"

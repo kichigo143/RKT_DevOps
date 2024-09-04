@@ -1,0 +1,28 @@
+####WORKING########
+- name: Manage Windows VMs
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Read VM settings from CSV
+      community.general.read_csv:
+        path: files/vm_settings.csv
+      register: csv_data
+
+    - name: Set VM settings fact
+      set_fact:
+        vm_settings: "{{ csv_data.list }}"
+
+- name: Apply settings to Windows VMs
+  hosts: windows
+  vars_files:
+    - vault.yml
+    - vars.yml
+  gather_facts: no
+  tasks:
+    - name: Reboot VMs
+      win_reboot:
+        reboot_timeout: 10
+      when: item.state == "domain"
+      loop: "{{ vm_settings }}"
+      loop_control:
+        label: "{{ item.hostname }}"

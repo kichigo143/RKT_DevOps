@@ -1,0 +1,42 @@
+# ---
+# - name: Configure Network and Domain Settings
+#   hosts: localhost
+#   gather_facts: no
+#   vars:
+#     csv_file: "files/vm_settings.csv"
+    
+#   tasks:
+#     - name: Read CSV file
+#       community.general.read_csv:
+#         path: "{{ csv_file }}"
+#         delimiter: ","
+#       register: csv_data
+
+#     - name: Process CSV data
+#       set_fact:
+#         hosts_data: "{{ csv_data | dict2items | map(attribute='value') | list }}"
+
+    # - name: Configure network and domain settings on Windows host
+    #   hosts: windows
+    #   gather_facts: yes
+    #   tasks:
+- name: Configure network settings
+  block:
+    - name: Set static IP address and DNS settings
+      ansible.windows.win_shell: |
+        netsh interface ip set address name="{{ item.hostname }}" static {{ item.ip_address }} {{ item.subnet_prefix }} {{ item.default_gateway }}
+        netsh interface ip set dns name="{{ item.hostname }}" static {{ item.preferred_dns }}
+        netsh interface ip add dns name="{{ item.hostname }}" {{ item.alternative_dns }} index=2
+      when: item.ip_configuration_type == 'static'
+      loop: "{{ vm_settings }}"
+      loop_control:
+        label: "{{ item.hostname }}"
+
+    - name: Set DHCP for network interface
+      ansible.windows.win_shell: |
+        netsh interface ip set address name="{{ item.hostname }}" source=dhcp
+        netsh interface ip set dns name="{{ item.hostname }}" source=dhcp
+      when: item.ip_configuration_type == 'dynamic'
+      loop: "{{ vm_settings }}"
+      loop_control:
+        label: "{{ item.hostname }}"
