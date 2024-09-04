@@ -25,5 +25,5 @@ jobs:
       env:
         VAULT_PASSWORD: ${{ secrets.VAULT_PASS }}
       run: |
-        cd RKT_DevOps/ansible_windows
+        cd RKT_DevOPS/ansible_windows
         ansible-playbook -i inventory.ini win_updates.yml --vault-password-file <(echo $VAULT_PASS)
