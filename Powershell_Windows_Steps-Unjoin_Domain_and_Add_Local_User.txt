@@ -30,6 +30,8 @@ hostlist.csv
 	2. Unjoin Domain
 	3. Add Local User
 	4. Uninstall Applications
+	5. Reboot server
+	6. Shutdown server
 
 
 
