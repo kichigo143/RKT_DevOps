@@ -22,7 +22,7 @@ Ensure no pending windows update
 
 Reference: https://docs.ansible.com/ansible/latest/os_guide/windows_setup.html#winrm-listener
 
-
+PRE-REQUISITES may change.
 
 1. Accenture DevOps Team to send copy of script files: 
 ansible_windows

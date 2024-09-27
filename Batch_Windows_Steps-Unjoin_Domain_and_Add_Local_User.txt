@@ -2,37 +2,22 @@ PRE_REQUISITES:
 
 Ensure Admin permission
 Ensure server is accessible from where you will run the script. On CMD, type ping <servername>
-Check .NET Framework 4.6 or higher
-Check Powershell version 5.1 or newer
-Ensure no pending windows update
-
-[Can be added in GPO]
-Enable Powershell Remoting if not enabled:
-Enable-PSRemoting
-
-Enable PS Execution Policy:
-set-executionpolicy remotesigned
+Ensure you're using a supported version of Windows (Windows Server or Professional editions).
+Install Remote Server Administration Tools (RSAT): On client machines, you may need to install RSAT, which includes the netdom utility.
+Ensure no pending windows updates
 
 PRE-REQUISITES may change.
 
-
 1. Accenture DevOps Team to send copy of script files: 
-win_updates.ps1
+win_updates.bat
 hostlist.csv
 
 2. Copy these files to a central server that can access the servers listed in hostlist
 
-3. Open Powershell as admin and go to the script location & run:
-.\win_updates.ps1
+3. Right-click the batch file and run as admin (if you're not logged in as administrator)
 
 4. Choose from the options and follow prompts:
 	1. Join Domain
 	2. Unjoin Domain
 	3. Add Local User
 	4. Uninstall Applications
-
-
-
-
-
-
