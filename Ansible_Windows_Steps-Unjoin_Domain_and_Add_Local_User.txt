@@ -1,0 +1,99 @@
+PRE_REQUISITES:
+
+Setup Ansible for Windows
+
+Ensure Admin permission
+Ensure server is accessible from where you will run the script. On CMD, type ping <servername>
+Check .NET Framework 4.6 or higher
+Check Powershell version 5.1 or newer
+
+Enable WinRM:
+winrm quickconfig
+
+Update WinRM parameters if less 500KB,no HTTPS listener (this is optional):
+winrm get winrm/config
+winrm set winrm/config/winrs '@{MaxEnvelopeSizekb="1024"}' or Set-Item -Path WSMan:\localhost\MaxEnvelopeSizekb -Value 1024
+winrm set winrm/config/service @{AllowUnencrypted="true"}
+
+Disable FW or create rule:
+New-NetFirewallRule -DisplayName "Windows Remote Management (HTTPS-In)" -Name "Windows Remote Management (HTTPS-In)" -Profile  Any -LocalPort 5986 -Protocol TCP
+
+Ensure no pending windows update
+
+Reference: https://docs.ansible.com/ansible/latest/os_guide/windows_setup.html#winrm-listener
+
+
+
+1. Accenture DevOps Team to send copy of script files: 
+ansible_windows
+- files
+	- vm_settings.csv
+- roles
+	- win_domain_magmt
+		- tasks > main.yml
+	- win_update_ip
+		- tasks > main.yml
+- ansible.cfg
+- inventory.ini
+- vars.yml
+- vault.yml
+- win_updates.yml
+
+
+2. Update these files before copying to ansible server
+	vm_settings.csv
+	inventory.ini	
+	vault file
+	
+	
+3. Copy these files to ansible server.
+
+
+4. SSH to ansible server & run the playbook in correct directory (make sure you have access):
+
+	a. For unjoining domain:
+	
+		ansible-playbook win_updates --tags domain_config -ask-vault-pass
+		
+		If inventory is needed:
+		ansible-playbook -i inventory.ini win_updates --tags domain_config -ask-vault-pass
+
+	
+	b. For adding a local user 'rkt_svc_account':
+	
+		ansible-playbook win_updates --tags add_user -ask-vault-pass
+
+		If inventory is needed:
+		ansible-playbook -i inventory.ini win_updates --tags add_user -ask-vault-pass
+		
+	c. (Optional) Reboot server:
+	
+		ansible-playbook win_updates --tags reboot -ask-vault-pass
+		
+		If inventory is needed:
+		ansible-playbook -i inventory.ini win_updates --tags reboot -ask-vault-pass
+		
+
+	(Optional) To update vault file
+		Note: vault file & pass can be updated or we can just use the existing
+	
+		Create vault file (delete the old vault file):
+		ansible-vault create vault.yml
+		
+		Update the existing:
+		ansible-vault edit vault.yml
+	
+	
+	(Optional) Update IP & DNS
+		ansible-playbook win_updates --tags win_update_ip -ask-vault-pass
+		
+	(Optional) Uninstall
+		ansible-playbook win_updates --tags uninstall -ask-vault-pass
+
+
+	
+	
+	
+	
+	
+
