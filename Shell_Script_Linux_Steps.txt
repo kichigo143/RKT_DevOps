@@ -1,0 +1,15 @@
+Shell_Script_Steps
+
+Login to any machine that has SSH connection to the Target Servers: ssh <hostname or IP address>
+Ensure to login with a user that has root permissions
+
+#Go to the scripts directory 
+cd scripts
+
+#Check that the scripts are available
+ls
+
+#run the scripts depending on which task to perform
+To Configure/Change IP Address   ---> run ./change_ip.sh
+To Unjoin Domain	         ---> run ./unjoin_domain.sh
+To Create a local account	 ---> run ./create_local_acct.sh

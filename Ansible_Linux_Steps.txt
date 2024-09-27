@@ -1,0 +1,81 @@
+Ansible_Linux_Steps
+
+Setup Ansible for Linux
+
+[Pre Requisites]
+
+1. Check ssh access to target servers, open SSH ports (22)
+2. Ensure sudo permissions
+3. Install Python 2.7 or 3.5+
+
+For Debian/Ubuntu-based Systems:
+sudo apt update
+sudo apt install python3 -y
+
+For Red Hat/CentOS/Fedora-based Systems:
+sudo yum install python3 -y or sudo dnf install python3 -y
+
+4. Create SSH Keys from Ansible Controller
+ssh-keygen -t ed25519 -C "ansible"
+(without passphrase)
+
+5. Copy SSH Keys to Target Servers
+ssh-copy-id -i ~/.ssh/ansible.pub <target server IP address>
+
+6.Login to target servers without passphrase
+ssh -i ~/.ssh/ansible <target server IP address>
+
+--------------------------------------
+
+1. Accenture DevOps Team to send copy of script files: 
+ansible_linux
+- roles
+	- adjoin-RH
+		- handlers > main.yml
+		- tasks > main.yml
+		- templates > sssd.conf.j2
+		- vars > main.yml
+	- network-config
+		- handlers > main.yml
+		- tasks > main.yml
+		- vars > main.yml
+- ansible.cfg
+- inventory
+- vault-AD
+- local_account_password.yml
+- adjoin-RH.yaml
+- adunjoin.yaml
+- create-localacct.yaml
+- install-package.yaml
+- remove-package.yaml
+- network-config-RH.yaml
+
+
+2. Update these files before copying to ansible server
+	inventory
+	ansible.cfg	
+	vault-AD
+	local_account_password.yml
+	
+	*update inventory file* 
+	- include only the hostname or IP address of Target Servers that needs to run the playbook
+	
+3. Copy these files to ansible server.
+
+4. SSH to ansible server & run the playbook in correct directory (make sure you have access):
+
+	a. For unjoining domain:
+		ansible-playbook adunjoin.yaml -K -vvvv
+		
+	b. For adding a local user:
+		ansible-playbook create-localacct.yaml -K -ask-vault-pass -vvvv
+
+	c. Update IP & DNS
+		ansible-playbook network-config-RH.yaml -K -vvvv
+		
+	d. Uninstall a package
+		ansible-playbook remove-package.yaml -K -vvvv
+	
+	e. Install a package
+		ansible-playbook install-package.yaml -K -vvvv
+
